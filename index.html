@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ankieta TeamZelazo</title>
+<meta name="theme-color" content="#0e0e0e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== KONFIGURACJA — uzupełnij swoje dane kontaktowe =====
+     Numer WhatsApp i e-mail ustawiasz w skrypcie na dole (CONFIG). */
+
+  :root {
+    --bg: #0e0e0e;
+    --card: #171717;
+    --card-2: #1f1f1f;
+    --line: #2c2c2c;
+    --line-strong: #3d3d3d;
+    --text: #f2f2f2;
+    --muted: #9b9b9b;
+    --steel: #a9a9a9;
+    --accent: #e2483b;
+    --accent-ink: #ffffff;
+    --ok: #4caf7a;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 50% -10%, rgba(255,255,255,.06), transparent 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    color: var(--text);
+    font: 16px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 120px; }
+
+  /* Nagłówek */
+  header { text-align: center; padding: 18px 0 8px; }
+  .logo {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+    color: var(--steel); text-decoration: none;
+  }
+  .logo .mark {
+    font-family: Anton, Impact, sans-serif; font-size: 44px; line-height: 1;
+    letter-spacing: -2px;
+    background: linear-gradient(180deg, #d0d0d0, #7a7a7a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .logo .word { font-weight: 600; font-size: 12px; letter-spacing: .32em; }
+  h1 {
+    font-family: Anton, Impact, sans-serif; font-weight: 400;
+    font-size: clamp(30px, 7vw, 44px); line-height: 1.05; margin: 22px 0 6px;
+    letter-spacing: .01em;
+  }
+  h1 .sq { display: inline-block; width: .62em; height: .62em; background: var(--accent); border-radius: 4px; margin-right: .3em; vertical-align: .06em; }
+  .lead { color: var(--muted); margin: 0 auto; max-width: 460px; font-size: 15px; }
+
+  /* Postęp */
+  .progress {
+    position: sticky; top: 0; z-index: 5;
+    margin: 22px -16px 0; padding: 12px 16px;
+    background: rgba(14,14,14,.86); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .steps { display: flex; gap: 6px; }
+  .steps button {
+    flex: 1; height: 6px; border: 0; padding: 0; border-radius: 3px; cursor: pointer;
+    background: var(--line-strong);
+  }
+  .steps button.done { background: var(--steel); }
+  .steps button.current { background: var(--accent); }
+  .progress-label { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--muted); }
+  .progress-label b { color: var(--text); font-weight: 600; }
+
+  /* Karta sekcji */
+  section.step { display: none; margin-top: 20px; }
+  section.step.active { display: block; animation: in .25s ease; }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 18px;
+  }
+  @media (min-width: 560px) { .card { padding: 28px 28px; } }
+  h2 {
+    font-family: Anton, Impact, sans-serif; font-weight: 400; letter-spacing: .02em;
+    font-size: 26px; margin: 0 0 4px; text-transform: uppercase;
+  }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  /* Pola */
+  .grid { display: grid; gap: 16px; }
+  @media (min-width: 560px) { .grid.two { grid-template-columns: 1fr 1fr; } .grid.three { grid-template-columns: 1fr 1fr 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field + .field, .grid + .field, .field + .grid, .grid + .grid { margin-top: 16px; }
+  .grid .field + .field { margin-top: 0; }
+  label, .label { font-weight: 600; font-size: 14px; }
+  .label small, label small { font-weight: 400; color: var(--muted); }
+  .req { color: var(--accent); margin-left: 2px; }
+  input[type=text], input[type=number], input[type=email], input[type=tel], input[type=url], input[type=time], textarea {
+    width: 100%; font: inherit; color: var(--text);
+    background: var(--card-2); border: 1px solid var(--line-strong); border-radius: 10px;
+    padding: 12px 14px; outline: none; transition: border-color .15s, box-shadow .15s;
+    -webkit-appearance: none; appearance: none;
+  }
+  input[type=time] { min-height: 48px; color-scheme: dark; }
+  textarea { min-height: 96px; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: #6d6d6d; }
+  input:focus, textarea:focus { border-color: var(--steel); box-shadow: 0 0 0 3px rgba(169,169,169,.15); }
+  .invalid input, .invalid textarea { border-color: var(--accent); }
+  .err { display: none; color: var(--accent); font-size: 13px; }
+  .invalid .err { display: block; }
+  .unit { position: relative; }
+  .unit input { padding-right: 46px; }
+  .unit span { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
+
+  /* Chipy (wybór) */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips label {
+    font-weight: 500; font-size: 14px; cursor: pointer; user-select: none;
+    border: 1px solid var(--line-strong); background: var(--card-2); border-radius: 999px;
+    padding: 9px 14px; transition: all .15s;
+  }
+  .chips input { position: absolute; opacity: 0; pointer-events: none; }
+  .chips input:checked + span { color: var(--accent-ink); }
+  .chips label:has(input:checked) { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chips label:has(input:focus-visible) { box-shadow: 0 0 0 3px rgba(226,72,59,.35); }
+
+  /* Skala 1–10 */
+  .scale { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+  .scale label {
+    display: flex; align-items: center; justify-content: center; height: 42px; cursor: pointer;
+    border: 1px solid var(--line-strong); background: var(--card-2); border-radius: 8px;
+    font-weight: 600; font-size: 14px; transition: all .15s;
+  }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale label:has(input:checked) { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .scale-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+  /* Zdjęcia */
+  .photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .photo {
+    position: relative; aspect-ratio: 3/4; border: 1px dashed var(--line-strong); border-radius: 10px;
+    background: var(--card-2) center/cover no-repeat; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: var(--muted);
+    font-size: 13px; text-align: center; overflow: hidden;
+  }
+  .photo b { color: var(--text); font-size: 14px; }
+  .photo.has { border-style: solid; border-color: var(--steel); }
+  .photo.has b, .photo.has span { display: none; }
+  .photo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .photo .plus { font-size: 24px; line-height: 1; color: var(--steel); }
+  .photo.has .plus { display: none; }
+  .note {
+    margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 14px;
+    background: rgba(226,72,59,.08); border: 1px solid rgba(226,72,59,.3); color: #f0c9c5;
+  }
+
+  /* Nawigacja */
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+    background: rgba(14,14,14,.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  .nav-in { max-width: 680px; margin: 0 auto; display: flex; gap: 10px; }
+  .btn {
+    font: inherit; font-weight: 600; border-radius: 10px; padding: 13px 18px; cursor: pointer;
+    border: 1px solid var(--line-strong); background: var(--card-2); color: var(--text);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--steel); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; flex: 1; }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn[hidden] { display: none; }
+
+  /* Podsumowanie */
+  .sum-block { border-top: 1px solid var(--line); padding: 14px 0; }
+  .sum-block:first-of-type { border-top: 0; padding-top: 0; }
+  .sum-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .sum-head h3 { margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--steel); }
+  .sum-head button { background: none; border: 0; color: var(--accent); font: inherit; font-size: 14px; cursor: pointer; padding: 4px; }
+  dl { margin: 0; display: grid; grid-template-columns: minmax(110px, 40%) 1fr; gap: 6px 12px; font-size: 14px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; white-space: pre-wrap; word-break: break-word; }
+  dd.empty { color: #5f5f5f; }
+  .send { display: grid; gap: 10px; margin-top: 18px; }
+  .toast {
+    position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%) translateY(20px);
+    background: #f2f2f2; color: #111; padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    opacity: 0; transition: all .2s; pointer-events: none; z-index: 10;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%); }
+
+  .done-screen { text-align: center; padding: 36px 18px; }
+  .done-screen .check {
+    width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center; background: var(--accent); font-size: 30px;
+  }
+  footer { text-align: center; color: #5f5f5f; font-size: 12px; margin-top: 28px; }
+
+  /* Pasek zapisu */
+  .savebar {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--line); font-size: 13px; color: var(--muted);
+  }
+  .savebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
+  .savebar .dot.busy { background: #d6a23c; }
+  .savebar .state { flex: 1; min-width: 150px; }
+  .btn.small { padding: 7px 12px; font-size: 13px; border-radius: 8px; }
+  .btn.ghost { background: transparent; }
+  .btn.danger:hover { border-color: var(--accent); color: #f0c9c5; }
+
+  /* Zdjęcia: usuwanie */
+  .photos { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 560px) { .photos { grid-template-columns: repeat(4, 1fr); } }
+  .photo label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+  .photo .rm {
+    display: none; position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%;
+    border: 0; background: rgba(0,0,0,.7); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; z-index: 2;
+  }
+  .photo.has .rm { display: block; }
+  .photo .tag {
+    display: none; position: absolute; left: 6px; bottom: 6px; z-index: 1;
+    background: rgba(0,0,0,.7); color: #fff; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+  }
+  .photo.has .tag { display: block; }
+
+  /* Wysyłka PDF */
+  .pdf-file {
+    display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 12px;
+    border: 1px solid var(--line-strong); border-radius: 12px; background: var(--card-2);
+  }
+  .pdf-icon {
+    flex: none; width: 42px; height: 52px; border-radius: 6px; background: var(--accent);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 7px;
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; color: #fff;
+  }
+  .pdf-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .pdf-meta b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pdf-meta span { font-size: 13px; color: var(--muted); }
+  .send-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn:disabled { opacity: .5; cursor: progress; }
+  .note[hidden] { display: none; }
+  .btn.off, .btn.off:hover {
+    background: #222; border-color: #2c2c2c; color: #6d6d6d; cursor: not-allowed; opacity: 1;
+  }
+
+  /* Raport PDF (renderowany poza ekranem) */
+  .report {
+    position: absolute; left: -10000px; top: 0; width: 794px;
+    background: #fff; color: #1a1a1a; font: 14px/1.5 Inter, sans-serif;
+  }
+  .report .r-cover { background: #121212; color: #f2f2f2; padding: 40px 48px 34px; }
+  .report .r-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .report .r-logo .m { display: block; font-family: Anton, sans-serif; font-size: 40px; line-height: 1; color: #b5b5b5; letter-spacing: -2px; }
+  .report .r-logo .w { font-size: 10px; letter-spacing: .32em; color: #9b9b9b; font-weight: 600; }
+  .report .r-date { text-align: right; font-size: 12px; color: #9b9b9b; line-height: 1.6; }
+  .report .r-kicker { margin-top: 30px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #e2483b; font-weight: 600; }
+  .report .r-name { font-family: Anton, sans-serif; font-size: 46px; line-height: 1.1; margin-top: 4px; }
+  .report .r-contact { color: #bdbdbd; font-size: 13px; margin-top: 4px; }
+  .report .r-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 24px; }
+  .report .r-stat { background: #1f1f1f; border: 1px solid #2c2c2c; border-radius: 10px; padding: 10px 14px; }
+  .report .r-stat .l { font-size: 11px; color: #9b9b9b; text-transform: uppercase; letter-spacing: .08em; }
+  .report .r-stat .v { font-family: Anton, sans-serif; font-size: 26px; line-height: 1.3; color: #fff; }
+  .report .r-stat .u { font-family: Inter, sans-serif; font-size: 13px; color: #9b9b9b; margin-left: 4px; }
+  .report .r-sec { padding: 26px 48px 8px; display: flex; align-items: center; gap: 10px; }
+  .report .r-sec .sq { width: 12px; height: 12px; background: #e2483b; border-radius: 2px; }
+  .report .r-sec h3 { font-family: Anton, sans-serif; font-weight: 400; font-size: 20px; letter-spacing: .03em; text-transform: uppercase; margin: 0; }
+  .report .r-measure { padding: 0 48px 4px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .report .r-m { background: #f4f4f4; border-radius: 8px; padding: 9px 12px; }
+  .report .r-m .l { font-size: 11px; color: #6b6b6b; }
+  .report .r-m .v { font-size: 18px; font-weight: 600; }
+  .report .r-m .v small { font-size: 12px; color: #6b6b6b; font-weight: 400; margin-left: 2px; }
+  .report .r-row { padding: 0 48px; }
+  .report .r-row-in { display: grid; grid-template-columns: 210px 1fr; gap: 16px; padding: 9px 0; border-bottom: 1px solid #ececec; }
+  .report .k { color: #6b6b6b; font-size: 13px; }
+  .report .v { white-space: pre-wrap; word-break: break-word; font-weight: 500; }
+  .report .r-scale { display: flex; align-items: center; gap: 3px; }
+  .report .r-scale i { width: 18px; height: 8px; border-radius: 2px; background: #e5e5e5; }
+  .report .r-scale i.on { background: #e2483b; }
+  .report .r-scale b { margin-left: 8px; }
+  .report .r-empty { padding: 4px 48px 0; color: #9b9b9b; font-size: 13px; }
+  .report .r-photos { padding: 6px 48px 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .report .r-ph { height: 450px; border-radius: 10px; background: #eee center/cover no-repeat; position: relative; }
+  .report .r-ph span { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.72); color: #fff; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
+  .report .r-end { padding: 24px 48px 30px; color: #6b6b6b; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-label="TeamZelazo">
+      <span class="mark">TZ</span>
+      <span class="word">TEAMZELAZO</span>
+    </div>
+    <h1><span class="sq" aria-hidden="true"></span>Ankieta przed startem</h1>
+    <p class="lead">Na jej podstawie ułożę Twój plan. Wypełnienie zajmie ok. 10–15 minut, a postęp zapisuje się automatycznie.</p>
+  </header>
+
+  <div class="progress" id="progress">
+    <div class="steps" id="steps"></div>
+    <div class="progress-label"><span id="stepName"></span><span><b id="stepNum">1</b> / <span id="stepTotal"></span></span></div>
+  </div>
+
+  <form id="form" novalidate autocomplete="on">
+
+    <!-- 1. Dane podstawowe -->
+    <section class="step" data-title="Dane podstawowe">
+      <div class="card">
+        <h2>Dane podstawowe</h2>
+        <p class="hint">Pomiary rób rano, na czczo, centymetrem krawieckim.</p>
+        <div class="grid two">
+          <div class="field"><label for="imie">Imię i nazwisko<span class="req">*</span></label><input id="imie" name="Imię i nazwisko" type="text" autocomplete="name" required><span class="err">Podaj imię i nazwisko</span></div>
+          <div class="field"><label for="tel">Telefon / WhatsApp<span class="req">*</span></label><input id="tel" name="Telefon" type="tel" autocomplete="tel" inputmode="tel" required><span class="err">Podaj numer telefonu</span></div>
+        </div>
+        <div class="field"><label for="email">E-mail</label><input id="email" name="E-mail" type="email" autocomplete="email" inputmode="email"></div>
+        <div class="grid three">
+          <div class="field"><label for="wiek">Wiek<span class="req">*</span></label><div class="unit"><input id="wiek" name="Wiek" type="number" inputmode="numeric" min="10" max="100" required><span>lat</span></div><span class="err">Podaj wiek</span></div>
+          <div class="field"><label for="wzrost">Wzrost<span class="req">*</span></label><div class="unit"><input id="wzrost" name="Wzrost" type="number" inputmode="decimal" step="0.5" required><span>cm</span></div><span class="err">Podaj wzrost</span></div>
+          <div class="field"><label for="waga">Waga<span class="req">*</span></label><div class="unit"><input id="waga" name="Waga" type="number" inputmode="decimal" step="0.1" required><span>kg</span></div><span class="err">Podaj wagę</span></div>
+        </div>
+        <div class="grid two">
+          <div class="field"><label for="talia">Talia <small>(linia pępka)</small></label><div class="unit"><input id="talia" name="Pomiar talii" type="number" inputmode="decimal" step="0.5"><span>cm</span></div></div>
+          <div class="field"><label for="ramie">Ramię <small>(biceps, najszerszy punkt)</small></label><div class="unit"><input id="ramie" name="Pomiar ramienia" type="number" inputmode="decimal" step="0.5"><span>cm</span></div></div>
+          <div class="field"><label for="posladki">Pośladki <small>(najszerszy punkt)</small></label><div class="unit"><input id="posladki" name="Pomiar pośladków" type="number" inputmode="decimal" step="0.5"><span>cm</span></div></div>
+          <div class="field"><label for="klatka">Klatka <small>(najszerszy punkt)</small></label><div class="unit"><input id="klatka" name="Pomiar klatki" type="number" inputmode="decimal" step="0.5"><span>cm</span></div></div>
+          <div class="field"><label for="udo">Udo <small>(najszerszy punkt)</small></label><div class="unit"><input id="udo" name="Pomiar uda" type="number" inputmode="decimal" step="0.5"><span>cm</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Zaangażowanie i historia -->
+    <section class="step" data-title="Zaangażowanie i historia">
+      <div class="card">
+        <h2>Zaangażowanie i historia</h2>
+        <p class="hint">Pisz szczerze. Im więcej wiem, tym lepiej dopasuję plan.</p>
+        <div class="field">
+          <span class="label">Dotychczasowy poziom zaangażowania</span>
+          <div class="scale" data-name="Poziom zaangażowania (1–10)"></div>
+          <div class="scale-ends"><span>rekreacyjnie</span><span>w 100%</span></div>
+        </div>
+        <div class="field"><label for="zaang">Opisz swoje zaangażowanie <small>(opcjonalnie)</small></label><textarea id="zaang" name="Zaangażowanie: opis" placeholder="Np. trenuję regularnie, ale z dietą bywa różnie…"></textarea></div>
+        <div class="field">
+          <span class="label">Plany startowe</span>
+          <div class="chips" data-name="Plany startowe" data-type="radio">
+            <label><input type="radio" name="Plany startowe" value="Nie planuję startów"><span>Nie planuję startów</span></label>
+            <label><input type="radio" name="Plany startowe" value="Rozważam start"><span>Rozważam start</span></label>
+            <label><input type="radio" name="Plany startowe" value="Planuję start"><span>Planuję start</span></label>
+            <label><input type="radio" name="Plany startowe" value="Już startuję"><span>Już startuję</span></label>
+          </div>
+        </div>
+        <div class="field"><label for="starty">Szczegóły startów <small>(federacja, kategoria, termin)</small></label><input id="starty" name="Plany startowe: szczegóły" type="text"></div>
+        <div class="field"><label for="przeszlosc">Przeszłość sportowa</label><textarea id="przeszlosc" name="Przeszłość sportowa" placeholder="Jakie sporty, jak długo, na jakim poziomie"></textarea></div>
+        <div class="field"><label for="problemy">Największe problemy w budowaniu sylwetki</label><textarea id="problemy" name="Największe problemy w budowaniu sylwetki" placeholder="Np. brak progresu w sile, podjadanie wieczorem, brak czasu…"></textarea></div>
+      </div>
+    </section>
+
+    <!-- 3. Zdrowie -->
+    <section class="step" data-title="Zdrowie i bezpieczeństwo">
+      <div class="card">
+        <h2>Zdrowie i bezpieczeństwo</h2>
+        <p class="hint">Jeśli coś Cię nie dotyczy, wpisz „brak” albo zostaw puste.</p>
+        <div class="field"><label for="leki">Leki</label><textarea id="leki" name="Leki" placeholder="Nazwa i dawka"></textarea></div>
+        <div class="field"><label for="kontuzje">Kontuzje</label><textarea id="kontuzje" name="Kontuzje" placeholder="Obecne i przebyte, co boli, przy jakich ruchach"></textarea></div>
+        <div class="field"><label for="leczenie">Aktualne leczenie</label><input id="leczenie" name="Aktualne leczenie" type="text"></div>
+        <div class="field">
+          <span class="label">Problemy zdrowotne <small>(zaznacz wszystkie, które dotyczą)</small></span>
+          <div class="chips" data-name="Problemy zdrowotne" data-type="checkbox">
+            <label><input type="checkbox" name="Problemy zdrowotne" value="Ciśnienie"><span>Ciśnienie</span></label>
+            <label><input type="checkbox" name="Problemy zdrowotne" value="Tarczyca"><span>Tarczyca</span></label>
+            <label><input type="checkbox" name="Problemy zdrowotne" value="Układ trawienny"><span>Układ trawienny</span></label>
+            <label><input type="checkbox" name="Problemy zdrowotne" value="Nerki"><span>Nerki</span></label>
+            <label><input type="checkbox" name="Problemy zdrowotne" value="Układ ruchu"><span>Układ ruchu</span></label>
+            <label><input type="checkbox" name="Problemy zdrowotne" value="Brak"><span>Brak</span></label>
+          </div>
+        </div>
+        <div class="field"><label for="zdrowie-opis">Opis problemów zdrowotnych</label><textarea id="zdrowie-opis" name="Problemy zdrowotne: opis" placeholder="Doprecyzuj zaznaczone powyżej"></textarea></div>
+        <div class="field"><label for="alergie">Alergie / nietolerancje</label><input id="alergie" name="Alergie / nietolerancje" type="text" placeholder="Np. laktoza, orzechy"></div>
+      </div>
+    </section>
+
+    <!-- 4. Styl życia -->
+    <section class="step" data-title="Styl życia">
+      <div class="card">
+        <h2>Styl życia</h2>
+        <p class="hint">Plan musi pasować do Twojego dnia, a nie odwrotnie.</p>
+        <div class="field">
+          <span class="label">Poziom energii</span>
+          <div class="scale" data-name="Poziom energii (1–10)"></div>
+          <div class="scale-ends"><span>brak energii</span><span>pełno energii</span></div>
+        </div>
+        <div class="field">
+          <span class="label">Rodzaj pracy</span>
+          <div class="chips" data-name="Rodzaj pracy" data-type="radio">
+            <label><input type="radio" name="Rodzaj pracy" value="Siedząca"><span>Siedząca</span></label>
+            <label><input type="radio" name="Rodzaj pracy" value="Stojąca"><span>Stojąca</span></label>
+            <label><input type="radio" name="Rodzaj pracy" value="Fizyczna"><span>Fizyczna</span></label>
+            <label><input type="radio" name="Rodzaj pracy" value="Mieszana"><span>Mieszana</span></label>
+            <label><input type="radio" name="Rodzaj pracy" value="Zmianowa"><span>Zmianowa</span></label>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="field"><label for="praca-h">Ilość pracy</label><div class="unit"><input id="praca-h" name="Ilość pracy (h/tydz.)" type="number" inputmode="numeric"><span>h/tydz.</span></div></div>
+          <div class="field"><label for="kroki">Kroki <small>(średnia tygodniowa)</small></label><div class="unit"><input id="kroki" name="Kroki (średnio dziennie)" type="number" inputmode="numeric" step="100"><span>/dzień</span></div></div>
+          <div class="field"><label for="plyny">Płyny dziennie</label><div class="unit"><input id="plyny" name="Płyny dziennie (l)" type="number" inputmode="decimal" step="0.1"><span>l</span></div></div>
+          <div class="field">
+            <span class="label">Ilość soli</span>
+            <div class="chips" data-name="Ilość soli" data-type="radio">
+              <label><input type="radio" name="Ilość soli" value="Mało"><span>Mało</span></label>
+              <label><input type="radio" name="Ilość soli" value="Średnio"><span>Średnio</span></label>
+              <label><input type="radio" name="Ilość soli" value="Dużo"><span>Dużo</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="grid three">
+          <div class="field"><label for="pobudka">Pobudka</label><input id="pobudka" name="Godzina pobudki" type="time"></div>
+          <div class="field"><label for="sen">Sen</label><input id="sen" name="Godzina snu" type="time"></div>
+          <div class="field"><label for="trening-h">Trening</label><input id="trening-h" name="Godzina treningu" type="time"></div>
+        </div>
+        <div class="field">
+          <span class="label">Jakość snu</span>
+          <div class="scale" data-name="Jakość snu (1–10)"></div>
+          <div class="scale-ends"><span>bardzo słaba</span><span>doskonała</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Trening -->
+    <section class="step" data-title="Trening">
+      <div class="card">
+        <h2>Trening</h2>
+        <p class="hint">Opisz, jak trenujesz teraz. Zdjęcia siłowni pomogą mi dobrać ćwiczenia do dostępnego sprzętu.</p>
+        <div class="field"><label for="staz">Staż treningowy</label><input id="staz" name="Staż" type="text" placeholder="Np. 3 lata, w tym rok regularnie"></div>
+        <div class="grid two">
+          <div class="field"><label for="ile-teraz">Treningi teraz</label><div class="unit"><input id="ile-teraz" name="Treningi w tygodniu (teraz)" type="number" inputmode="numeric" min="0" max="14"><span>/tydz.</span></div></div>
+          <div class="field"><label for="ile-moge">Ile możesz trenować</label><div class="unit"><input id="ile-moge" name="Treningi w tygodniu (możliwe)" type="number" inputmode="numeric" min="0" max="14"><span>/tydz.</span></div></div>
+        </div>
+        <div class="field"><label for="opis-tren">Opis obecnego treningu <small>(jak najdokładniej)</small></label><textarea id="opis-tren" name="Opis obecnego treningu" style="min-height:140px" placeholder="Podział, ćwiczenia, serie × powtórzenia, ciężary, cardio"></textarea></div>
+        <div class="field"><label for="silownia">Link do zdjęć siłowni</label><input id="silownia" name="Link do zdjęć siłowni" type="url" inputmode="url" placeholder="Google Drive, Dropbox, Google Maps itp."></div>
+      </div>
+    </section>
+
+    <!-- 6. Dieta -->
+    <section class="step" data-title="Dieta i suplementacja">
+      <div class="card">
+        <h2>Dieta i suplementacja</h2>
+        <p class="hint">Bez oceniania, potrzebuję po prostu punktu wyjścia.</p>
+        <div class="field"><label for="dieta">Obecna dieta</label><textarea id="dieta" name="Obecna dieta" style="min-height:140px" placeholder="Przykładowy dzień: posiłki, godziny, czy liczysz kalorie, czego nie jesz"></textarea></div>
+        <div class="field"><label for="suple">Obecna suplementacja</label><textarea id="suple" name="Obecna suplementacja" placeholder="Nazwa, dawka, pora"></textarea></div>
+      </div>
+    </section>
+
+    <!-- 7. Uwagi i zdjęcia -->
+    <section class="step" data-title="Uwagi i zdjęcia">
+      <div class="card">
+        <h2>Uwagi dodatkowe</h2>
+        <p class="hint">Dopisz wszystko, co uważasz za ważne, a nie znalazło się powyżej.</p>
+        <div class="field"><label for="uwagi">Uwagi</label><textarea id="uwagi" name="Uwagi dodatkowe"></textarea></div>
+        <div class="field">
+          <span class="label">Zdjęcia sylwetki <small>(w dobrym świetle)</small></span>
+          <div class="photos">
+            <div class="photo" data-photo="Przód"><label><input type="file" accept="image/*"><span class="plus">+</span><b>Przód</b><span>dodaj</span></label><span class="tag">Przód</span><button type="button" class="rm" aria-label="Usuń zdjęcie">×</button></div>
+            <div class="photo" data-photo="Tył"><label><input type="file" accept="image/*"><span class="plus">+</span><b>Tył</b><span>dodaj</span></label><span class="tag">Tył</span><button type="button" class="rm" aria-label="Usuń zdjęcie">×</button></div>
+            <div class="photo" data-photo="Bok"><label><input type="file" accept="image/*"><span class="plus">+</span><b>Bok</b><span>dodaj</span></label><span class="tag">Bok</span><button type="button" class="rm" aria-label="Usuń zdjęcie">×</button></div>
+            <div class="photo" data-photo="Poza"><label><input type="file" accept="image/*"><span class="plus">+</span><b>Poza</b><span>opcjonalnie</span></label><span class="tag">Poza</span><button type="button" class="rm" aria-label="Usuń zdjęcie">×</button></div>
+          </div>
+          <div class="note">Zdjęcia trafią do PDF-a z ankietą. Mile widziane są też pozy kulturystyczne.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Podsumowanie -->
+    <section class="step" data-title="Podsumowanie">
+      <div class="card">
+        <h2>Sprawdź i wyślij</h2>
+        <p class="hint">Przejrzyj odpowiedzi. Kliknij „Popraw”, żeby wrócić do sekcji.</p>
+        <div id="summary"></div>
+        <div class="pdf-file">
+          <div class="pdf-icon">PDF</div>
+          <div class="pdf-meta"><b id="pdfName">Ankieta.pdf</b><span id="pdfState">Przygotowuję…</span></div>
+          <button type="button" class="btn small" id="preview" disabled>Podgląd</button>
+        </div>
+        <div class="send">
+          <button type="button" class="btn primary" id="share" disabled>Wyślij PDF (WhatsApp / e-mail)</button>
+          <div class="note" id="afterDl" style="margin:0" hidden>PDF zapisał się w Pobranych. Dołącz go do wiadomości na WhatsApp lub w e-mailu.</div>
+          <div class="send-row">
+            <button type="button" class="btn" id="openWa">Otwórz WhatsApp</button>
+            <button type="button" class="btn" id="openMail">Otwórz e-mail</button>
+          </div>
+          <div class="send-row">
+            <button type="button" class="btn" id="download" disabled>Pobierz PDF</button>
+            <button type="button" class="btn" id="copy">Kopiuj jako tekst</button>
+          </div>
+        </div>
+        <p class="hint" style="margin:14px 0 0">Po odesłaniu ankiety proszę o cierpliwość: odezwę się tak szybko, jak będę mógł.</p>
+      </div>
+    </section>
+  </form>
+
+  <div class="savebar">
+    <span class="dot" id="saveDot"></span>
+    <span class="state" id="saveState">Odpowiedzi zapisują się automatycznie na tym urządzeniu</span>
+    <button type="button" class="btn small" id="saveNow">Zapisz</button>
+    <button type="button" class="btn small ghost danger" id="clearAll">Zacznij od nowa</button>
+  </div>
+
+  <footer>TEAMZELAZO · Oferta trenerska</footer>
+</div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <button type="button" class="btn" id="prev">Wstecz</button>
+    <button type="button" class="btn primary" id="next">Dalej</button>
+  </div>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+  // ===== KONFIGURACJA =====
+  // Numer WhatsApp w formacie międzynarodowym, same cyfry, np. "48600123456".
+  // Pusty = WhatsApp zapyta, do kogo wysłać.
+  const CONFIG = {
+    whatsapp: "",
+    email: "",
+    storageKey: "tz-ankieta-v1",
+  };
+
+  const form = document.getElementById("form");
+  const steps = [...document.querySelectorAll("section.step")];
+  const stepsBar = document.getElementById("steps");
+  const prevBtn = document.getElementById("prev");
+  const nextBtn = document.getElementById("next");
+  const nav = document.querySelector(".nav");
+  let current = 0;
+
+  // Skale 1–10
+  document.querySelectorAll(".scale").forEach(el => {
+    const name = el.dataset.name;
+    for (let i = 1; i <= 10; i++) {
+      el.insertAdjacentHTML("beforeend",
+        `<label><input type="radio" name="${name}" value="${i}"><span>${i}</span></label>`);
+    }
+  });
+
+  // Pasek postępu
+  steps.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-label", s.dataset.title);
+    b.addEventListener("click", () => { if (i <= maxReached) go(i); });
+    stepsBar.appendChild(b);
+  });
+  document.getElementById("stepTotal").textContent = steps.length;
+  let maxReached = 0;
+
+  function go(i) {
+    current = Math.max(0, Math.min(i, steps.length - 1));
+    maxReached = Math.max(maxReached, current);
+    steps.forEach((s, j) => s.classList.toggle("active", j === current));
+    [...stepsBar.children].forEach((b, j) => {
+      b.className = j === current ? "current" : (j <= maxReached ? "done" : "");
+    });
+    document.getElementById("stepName").textContent = steps[current].dataset.title;
+    document.getElementById("stepNum").textContent = current + 1;
+    prevBtn.hidden = current === 0;
+    const last = current === steps.length - 1;
+    nav.style.display = last ? "none" : "";
+    nextBtn.textContent = current === steps.length - 2 ? "Podsumowanie" : "Dalej";
+    if (last) { renderSummary(); preparePdf().catch(() => {}); }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    save();
+  }
+
+  function validate(section) {
+    let ok = true, first = null;
+    section.querySelectorAll("[required]").forEach(inp => {
+      const field = inp.closest(".field");
+      const bad = !inp.value.trim();
+      field.classList.toggle("invalid", bad);
+      if (bad) { ok = false; first = first || inp; }
+    });
+    if (first) first.focus();
+    return ok;
+  }
+  form.addEventListener("input", e => {
+    const f = e.target.closest(".field");
+    if (f && e.target.value.trim()) f.classList.remove("invalid");
+    invalidatePdf();
+    save();
+  });
+  form.addEventListener("change", () => { invalidatePdf(); save(); });
+
+  nextBtn.addEventListener("click", () => { if (validate(steps[current])) go(current + 1); });
+  prevBtn.addEventListener("click", () => go(current - 1));
+
+  // Zbieranie odpowiedzi
+  function collect() {
+    return steps.slice(0, -1).map(s => {
+      const rows = [];
+      const seen = new Set();
+      s.querySelectorAll("input:not([type=file]), textarea").forEach(inp => {
+        const name = inp.name;
+        if (!name || seen.has(name)) return;
+        seen.add(name);
+        let val;
+        const kind = inp.closest(".scale") ? "scale" : "text";
+        if (inp.type === "radio") {
+          val = (s.querySelector(`input[name="${CSS.escape(name)}"]:checked`) || {}).value || "";
+        } else if (inp.type === "checkbox") {
+          val = [...s.querySelectorAll(`input[name="${CSS.escape(name)}"]:checked`)].map(c => c.value).join(", ");
+        } else {
+          val = inp.value.trim();
+          const unit = inp.parentElement.classList.contains("unit") ? inp.parentElement.querySelector("span").textContent : "";
+          if (val && unit) val += (unit.startsWith("/") ? "" : " ") + unit;
+        }
+        rows.push([name, val, kind]);
+      });
+      s.querySelectorAll("[data-photo]").forEach(box => {
+        rows.push(["Zdjęcie: " + box.dataset.photo, photos[box.dataset.photo] ? "dodane" : "", "photo"]);
+      });
+      return { title: s.dataset.title, index: steps.indexOf(s), rows };
+    });
+  }
+
+  const esc = t => t.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function renderSummary() {
+    document.getElementById("summary").innerHTML = collect().map(sec => `
+      <div class="sum-block">
+        <div class="sum-head"><h3>${esc(sec.title)}</h3><button type="button" data-go="${sec.index}">Popraw</button></div>
+        <dl>${sec.rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd class="${v ? "" : "empty"}">${v ? esc(v) : "—"}</dd>`).join("")}</dl>
+      </div>`).join("");
+  }
+  document.getElementById("summary").addEventListener("click", e => {
+    const b = e.target.closest("[data-go]");
+    if (b) go(+b.dataset.go);
+  });
+
+  function asText() {
+    const lines = ["ANKIETA TEAMZELAZO", ""];
+    collect().forEach(sec => {
+      const filled = sec.rows.filter(([, v]) => v);
+      if (!filled.length) return;
+      lines.push("== " + sec.title.toUpperCase() + " ==");
+      filled.forEach(([k, v]) => lines.push(`${k}: ${v}`));
+      lines.push("");
+    });
+    return lines.join("\n").trim();
+  }
+
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  const clientName = () => form.querySelector("#imie").value.trim();
+  const shortMsg = () => `Cześć! W załączniku moja ankieta przed startem (PDF).${clientName() ? " – " + clientName() : ""}`;
+
+  document.getElementById("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(asText()); toast("Skopiowano odpowiedzi"); }
+    catch { toast("Nie udało się skopiować"); }
+  });
+  // Bez numeru / adresu w CONFIG przyciski są szare i nieaktywne
+  [["openWa", CONFIG.whatsapp], ["openMail", CONFIG.email]].forEach(([id, value]) => {
+    if (value) return;
+    const b = document.getElementById(id);
+    b.disabled = true;
+    b.classList.add("off");
+    b.title = "Wkrótce";
+  });
+  document.getElementById("openWa").addEventListener("click", () => {
+    window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(shortMsg())}`, "_blank");
+  });
+  document.getElementById("openMail").addEventListener("click", () => {
+    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Ankieta TeamZelazo – " + clientName())}&body=${encodeURIComponent(shortMsg() + "\n\n")}`;
+  });
+
+  // ===== Zdjęcia: zmniejszamy i trzymamy w IndexedDB, żeby przetrwały odświeżenie =====
+  const photos = {};
+  const idb = (() => {
+    let dbp;
+    const open = () => dbp ||= new Promise((res, rej) => {
+      const r = indexedDB.open("tz-ankieta", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("photos");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const run = (mode, fn) => open().then(db => new Promise((res, rej) => {
+      const t = db.transaction("photos", mode);
+      const req = fn(t.objectStore("photos"));
+      t.oncomplete = () => res(req && req.result);
+      t.onerror = () => rej(t.error);
+    }));
+    return {
+      get: k => run("readonly", s => s.get(k)),
+      set: (k, v) => run("readwrite", s => s.put(v, k)),
+      del: k => run("readwrite", s => s.delete(k)),
+      clear: () => run("readwrite", s => s.clear()),
+    };
+  })();
+
+  async function shrink(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+      const r = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth * r);
+      c.height = Math.round(img.naturalHeight * r);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      return c.toDataURL("image/jpeg", 0.82);
+    } finally { URL.revokeObjectURL(url); }
+  }
+
+  function showPhoto(box, dataUrl) {
+    box.classList.toggle("has", !!dataUrl);
+    box.style.backgroundImage = dataUrl ? `url(${dataUrl})` : "";
+  }
+
+  document.querySelectorAll(".photo").forEach(box => {
+    const key = box.dataset.photo;
+    const inp = box.querySelector("input");
+    inp.addEventListener("change", async () => {
+      const f = inp.files[0];
+      inp.value = "";
+      if (!f) return;
+      setSaveState("busy");
+      try {
+        photos[key] = await shrink(f);
+        showPhoto(box, photos[key]);
+        await idb.set(key, photos[key]).catch(() => {});
+        invalidatePdf();
+        setSaveState("saved");
+      } catch { toast("Nie udało się wczytać zdjęcia"); setSaveState("saved"); }
+    });
+    box.querySelector(".rm").addEventListener("click", () => {
+      delete photos[key];
+      showPhoto(box, null);
+      idb.del(key).catch(() => {});
+      invalidatePdf();
+      setSaveState("saved");
+    });
+  });
+
+  // ===== Zapis szkicu (tylko w tej przeglądarce) =====
+  const saveDot = document.getElementById("saveDot");
+  const saveState = document.getElementById("saveState");
+  function setSaveState(s) {
+    saveDot.classList.toggle("busy", s === "busy");
+    if (s === "busy") { saveState.textContent = "Zapisuję…"; return; }
+    if (s === "error") { saveState.textContent = "Nie mogę zapisać w tej przeglądarce (tryb prywatny?)"; return; }
+    const t = new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+    saveState.textContent = `Zapisano automatycznie · ${t}`;
+  }
+
+  function save() {
+    try {
+      const data = {};
+      form.querySelectorAll("input:not([type=file]), textarea").forEach(inp => {
+        if (inp.type === "radio" || inp.type === "checkbox") {
+          if (inp.checked) (data[inp.name] = data[inp.name] || []).push(inp.value);
+        } else data[inp.name] = inp.value;
+      });
+      localStorage.setItem(CONFIG.storageKey, JSON.stringify({ data, step: current, max: maxReached }));
+      setSaveState("saved");
+    } catch { setSaveState("error"); }
+  }
+
+  document.getElementById("saveNow").addEventListener("click", () => { save(); toast("Zapisano"); });
+  document.getElementById("clearAll").addEventListener("click", async () => {
+    if (!confirm("Usunąć wszystkie odpowiedzi i zdjęcia z tego urządzenia? Tego nie da się cofnąć.")) return;
+    try { localStorage.removeItem(CONFIG.storageKey); } catch {}
+    await idb.clear().catch(() => {});
+    Object.keys(photos).forEach(k => delete photos[k]);
+    document.querySelectorAll(".photo").forEach(b => showPhoto(b, null));
+    form.reset();
+    form.querySelectorAll(".invalid").forEach(f => f.classList.remove("invalid"));
+    maxReached = 0;
+    invalidatePdf();
+    go(0);
+    toast("Wyczyszczono");
+  });
+
+  // ===== PDF =====
+  const PAGE_W = 794, PAGE_H = 1123, M_TOP = 44, M_BOTTOM = 60;
+  let pdfPromise = null, pdfFile = null;
+  const fmtDate = () => new Date().toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+  function invalidatePdf() { pdfPromise = null; pdfFile = null; }
+
+  function reportHtml() {
+    const secs = collect();
+    const v = name => (form.querySelector(`[name="${CSS.escape(name)}"]`) || {}).value?.trim() || "";
+    const w = parseFloat(v("Waga")), h = parseFloat(v("Wzrost"));
+    const bmi = w && h ? (w / ((h / 100) ** 2)).toFixed(1) : "";
+    const stat = (l, val, u) => `<div class="r-stat"><div class="l">${l}</div><div class="v">${val ? esc(val) : "—"}${val && u ? `<span class="u">${u}</span>` : ""}</div></div>`;
+    const meas = [["Talia", "Pomiar talii"], ["Ramię", "Pomiar ramienia"], ["Pośladki", "Pomiar pośladków"], ["Klatka", "Pomiar klatki"], ["Udo", "Pomiar uda"]];
+    const contact = [v("Telefon"), v("E-mail")].filter(Boolean).map(esc).join(" · ");
+
+    let html = `
+      <div data-block class="r-cover">
+        <div class="r-top">
+          <div class="r-logo"><span class="m">TZ</span><span class="w">TEAMZELAZO</span></div>
+          <div class="r-date">Ankieta przed startem<br>${fmtDate()}</div>
+        </div>
+        <div class="r-kicker">Ankieta podopiecznego</div>
+        <div class="r-name">${esc(clientName() || "Bez imienia")}</div>
+        ${contact ? `<div class="r-contact">${contact}</div>` : ""}
+        <div class="r-stats">
+          ${stat("Wiek", v("Wiek"), "lat")}${stat("Wzrost", v("Wzrost"), "cm")}${stat("Waga", v("Waga"), "kg")}${stat("BMI", bmi, "")}
+        </div>
+      </div>
+      <div data-block data-keep class="r-sec"><span class="sq"></span><h3>Pomiary obwodów</h3></div>
+      <div data-block class="r-measure">
+        ${meas.map(([l, n]) => `<div class="r-m"><div class="l">${l}</div><div class="v">${v(n) ? esc(v(n)) + "<small>cm</small>" : "—"}</div></div>`).join("")}
+      </div>`;
+
+    secs.slice(1).forEach(sec => {
+      const rows = sec.rows.filter(([, val, kind]) => val && kind !== "photo");
+      if (!rows.length && sec.rows.some(r => r[2] === "photo")) return;
+      html += `<div data-block data-keep class="r-sec"><span class="sq"></span><h3>${esc(sec.title)}</h3></div>`;
+      if (!rows.length) { html += `<div data-block class="r-empty">Brak odpowiedzi</div>`; return; }
+      rows.forEach(([k, val, kind]) => {
+        const shown = kind === "scale"
+          ? `<div class="r-scale">${Array.from({ length: 10 }, (_, i) => `<i class="${i < +val ? "on" : ""}"></i>`).join("")}<b>${val}/10</b></div>`
+          : `<div class="v">${esc(val)}</div>`;
+        html += `<div data-block class="r-row"><div class="r-row-in"><div class="k">${esc(k.replace(/ \(1–10\)$/, ""))}</div>${shown}</div></div>`;
+      });
+    });
+
+    const ph = Object.entries(photos);
+    if (ph.length) {
+      html += `<div data-block data-keep class="r-sec"><span class="sq"></span><h3>Zdjęcia sylwetki</h3></div>`;
+      for (let i = 0; i < ph.length; i += 2) {
+        html += `<div data-block class="r-photos">${ph.slice(i, i + 2).map(([k, src]) =>
+          `<div class="r-ph" style="background-image:url(${src})"><span>${esc(k)}</span></div>`).join("")}</div>`;
+      }
+    }
+    html += `<div data-block class="r-end">Wygenerowano z formularza TeamZelazo · ${fmtDate()}</div>`;
+    return html;
+  }
+
+  // Dzieli bloki raportu na strony A4 tak, żeby nie ciąć wierszy w połowie
+  function paginate(blocks) {
+    const pages = [[]];
+    let y = 0;
+    const bottom = PAGE_H - M_BOTTOM;
+    blocks.forEach((b, i) => {
+      const need = b.h + (b.keep && blocks[i + 1] ? Math.min(blocks[i + 1].h, 220) : 0);
+      if (y + need > bottom && y > M_TOP) { pages.push([]); y = M_TOP; }
+      let off = 0;
+      while (off < b.h) {
+        const take = Math.min(bottom - y, b.h - off);
+        pages[pages.length - 1].push({ src: b.top + off, h: take, y });
+        y += take; off += take;
+        if (off < b.h) { pages.push([]); y = M_TOP; }
+      }
+    });
+    return pages;
+  }
+
+  async function buildPdf() {
+    await document.fonts.ready;
+    const host = document.createElement("div");
+    host.className = "report";
+    host.innerHTML = reportHtml();
+    document.body.appendChild(host);
+    try {
+      await Promise.all([...host.querySelectorAll(".r-ph")].map(el => new Promise(res => {
+        const i = new Image(); i.onload = i.onerror = res; i.src = el.style.backgroundImage.slice(5, -2);
+      })));
+      const blocks = [...host.querySelectorAll("[data-block]")].map(el => ({ top: el.offsetTop, h: el.offsetHeight, keep: el.hasAttribute("data-keep") }));
+      const total = host.offsetHeight;
+      const S = Math.max(1.25, Math.min(2, Math.sqrt(14e6 / (PAGE_W * total))));
+      const big = await html2canvas(host, {
+        scale: S, backgroundColor: "#ffffff", logging: false, windowWidth: 1100, scrollX: 0, scrollY: 0,
+        onclone: d => { d.querySelector(".report").style.left = "0px"; },
+      });
+      const k = big.width / PAGE_W;
+      const pages = paginate(blocks);
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit: "pt", format: "a4", compress: true });
+      const footL = `TEAMZELAZO · Ankieta przed startem${clientName() ? " · " + clientName() : ""}`;
+      pages.forEach((parts, i) => {
+        const c = document.createElement("canvas");
+        c.width = Math.round(PAGE_W * k); c.height = Math.round(PAGE_H * k);
+        const ctx = c.getContext("2d");
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        parts.forEach(p => ctx.drawImage(big, 0, p.src * k, big.width, p.h * k, 0, p.y * k, c.width, p.h * k));
+        ctx.fillStyle = "#e2483b"; ctx.fillRect(48 * k, (PAGE_H - 40) * k, 10 * k, 2 * k);
+        ctx.fillStyle = "#9b9b9b"; ctx.font = `500 ${11 * k}px Inter, sans-serif`; ctx.textBaseline = "alphabetic";
+        ctx.textAlign = "left"; ctx.fillText(footL, 48 * k, (PAGE_H - 22) * k);
+        ctx.textAlign = "right"; ctx.fillText(`${i + 1} / ${pages.length}`, (PAGE_W - 48) * k, (PAGE_H - 22) * k);
+        if (i) pdf.addPage();
+        pdf.addImage(c.toDataURL("image/jpeg", 0.86), "JPEG", 0, 0, 595.28, 841.89, undefined, "FAST");
+      });
+      const safe = (clientName() || "ankieta").replace(/[\\/:*?"<>|]+/g, "").trim();
+      return { file: new File([pdf.output("blob")], `Ankieta TeamZelazo - ${safe}.pdf`, { type: "application/pdf" }), pages: pages.length };
+    } finally { host.remove(); }
+  }
+
+  const ui = {
+    name: document.getElementById("pdfName"), state: document.getElementById("pdfState"),
+    share: document.getElementById("share"), preview: document.getElementById("preview"), download: document.getElementById("download"),
+  };
+  function preparePdf() {
+    if (pdfPromise) return pdfPromise;
+    [ui.share, ui.preview, ui.download].forEach(b => b.disabled = true);
+    ui.state.textContent = "Przygotowuję PDF…";
+    const p = pdfPromise = buildPdf().then(res => {
+      if (p !== pdfPromise) return res;
+      pdfFile = res.file;
+      ui.name.textContent = res.file.name;
+      ui.state.textContent = `${res.pages} ${res.pages === 1 ? "strona" : res.pages < 5 ? "strony" : "stron"} · ${(res.file.size / 1048576).toFixed(1)} MB`;
+      [ui.share, ui.preview, ui.download].forEach(b => b.disabled = false);
+      return res;
+    }).catch(err => {
+      console.error(err);
+      if (p === pdfPromise) { pdfPromise = null; ui.state.textContent = "Nie udało się utworzyć PDF-a. Sprawdź internet i spróbuj ponownie."; }
+      throw err;
+    });
+    return p;
+  }
+
+  function downloadPdf(file) {
+    const url = URL.createObjectURL(file);
+    const a = Object.assign(document.createElement("a"), { href: url, download: file.name });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+
+  ui.share.addEventListener("click", async () => {
+    if (!pdfFile) return;
+    const file = pdfFile;
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: "Ankieta TeamZelazo", text: shortMsg() });
+        toast("Wysłano 💪");
+        return;
+      } catch (e) { if (e.name === "AbortError") return; }
+    }
+    downloadPdf(file);
+    document.getElementById("afterDl").hidden = false;
+  });
+  ui.download.addEventListener("click", () => { if (pdfFile) downloadPdf(pdfFile); });
+  ui.preview.addEventListener("click", () => { if (pdfFile) window.open(URL.createObjectURL(pdfFile), "_blank"); });
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CONFIG.storageKey) || "null");
+      if (!saved) return;
+      form.querySelectorAll("input:not([type=file]), textarea").forEach(inp => {
+        const v = saved.data[inp.name];
+        if (v == null) return;
+        if (inp.type === "radio" || inp.type === "checkbox") inp.checked = v.includes(inp.value);
+        else inp.value = v;
+      });
+      maxReached = saved.max || 0;
+      current = Math.min(saved.step || 0, steps.length - 2);
+    } catch {}
+  }
+
+  load();
+  go(current);
+  try { navigator.storage?.persist?.(); } catch {}
+  document.querySelectorAll(".photo").forEach(box => {
+    idb.get(box.dataset.photo).then(src => {
+      if (!src) return;
+      photos[box.dataset.photo] = src;
+      showPhoto(box, src);
+      if (current === steps.length - 1) { invalidatePdf(); renderSummary(); preparePdf().catch(() => {}); }
+    }).catch(() => {});
+  });
+</script>
+</body>
+</html>
